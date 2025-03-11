@@ -25,7 +25,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: your_dockerhub_username/your_repository:latest
+          tags: pjmf17/gh_laravel:latest
 
       - name: Install Railway CLI
         run: npm install -g @railway/cli
