@@ -1,18 +1,20 @@
+version: '3.8'
+
 services:
-  # Servidor PHP per a Laravel
+  # Laravel App
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: cgalleluoc/gh_laravel:latest
     container_name: laravel_app
     ports:
       - "8013:8013"
     volumes:
-      - .:/var/www/pmoreno/home
+      - .:/var/www/html
     networks:
       - laravel_network
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    command: [ "sh", "-c", "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000" ]
     environment:
       - DB_CONNECTION=mysql
       - DB_HOST=db
@@ -25,24 +27,31 @@ services:
   db:
     image: mysql:5.7
     container_name: mysql_db
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
     ports:
-      - "3311:3311"
+      - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
     networks:
       - laravel_network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      retries: 5
+      timeout: 3s
 
   # phpMyAdmin per gestionar la base de dades
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      PMA_HOST: db
     ports:
-      #- "8080:80"
       - "8014:80"
     networks:
       - laravel_network
