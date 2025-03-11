@@ -18,7 +18,7 @@ services:
     environment:
       - DB_CONNECTION=mysql
       - DB_HOST=db
-      - DB_PORT=3311
+      - DB_PORT=3306
       - DB_DATABASE=laravel
       - DB_USERNAME=root
       - DB_PASSWORD=root
@@ -34,7 +34,7 @@ services:
       MYSQL_USER: laravel
       MYSQL_PASSWORD: laravel
     ports:
-      - "3306:3306"
+      - "3311:3311"
     volumes:
       - db_data:/var/lib/mysql
     networks:
