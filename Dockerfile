@@ -27,7 +27,7 @@ RUN ls -la /var/www/pmoreno/home
 RUN composer install --no-dev --optimize-autoloader
 
 # Exposem el port en el qual Laravel està corrent (per defecte, 8000)
-EXPOSE 8000
+EXPOSE 8013
 
 # Comandament per iniciar el servidor Laravel
 CMD ["php-fpm"]
