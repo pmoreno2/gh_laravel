@@ -1,10 +1,13 @@
-name: Build, Push and Deploy to Railway
+
+name: Build, Push and Deploy to Server via SSH
+
 on:
-   push:
-     branches: [ main ]
+  push:
+    branches: [ main ]
+
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -27,10 +30,19 @@ jobs:
           push: true
           tags: pjmf17/gh_laravel:latest
 
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
+      - name: Install SSH client
+        run: sudo apt-get update && sudo apt-get install -y openssh-client
 
-      - name: Deploy to Railway
-        run: railway up --detach
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            cd /var/www/cgallel/home  
+            docker pull pjmf17/gh_laravel:latest
+            docker-compose down
+            docker-compose up -d
+          EOF
